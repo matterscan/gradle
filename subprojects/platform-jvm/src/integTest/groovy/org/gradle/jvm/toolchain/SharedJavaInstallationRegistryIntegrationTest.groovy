@@ -18,10 +18,11 @@ package org.gradle.jvm.toolchain
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.AvailableJavaHomes
+import org.gradle.internal.jvm.Jvm
 
 class SharedJavaInstallationRegistryIntegrationTest extends AbstractIntegrationSpec {
 
-    def "installation registry empty without environment setup"() {
+    def "installation registry has only current vm without environment setup"() {
         buildFile << """
             import org.gradle.jvm.toolchain.internal.SharedJavaInstallationRegistry;
             import javax.inject.Inject
@@ -42,8 +43,10 @@ class SharedJavaInstallationRegistryIntegrationTest extends AbstractIntegrationS
 
         when:
         succeeds("show")
+
         then:
-        outputContains("installations:[]")
+        def currentVm = Jvm.current().getJavaHome().getAbsolutePath()
+        outputContains("installations:[${currentVm}]")
     }
 
     def "installation registry is populated by environment"() {
